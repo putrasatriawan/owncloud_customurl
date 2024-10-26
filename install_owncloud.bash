@@ -41,11 +41,11 @@ echo "🚀 Menjalankan instalasi OwnCloud..."
 sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --database "mysql" \
    --database-name "ownclouddb" \
-   --database-user "ownclouduser" \
-   --database-pass "password" \
-   --admin-user "admin" \
-   --admin-pass "admin"
-
+   --database-user "root"\
+   --database-pass "1234" \
+   --admin-user "root" \
+   --admin-pass "1234"
+   
 # Backup konfigurasi sebelum perubahan
 echo "📋 Membackup file konfigurasi..."
 sudo cp /var/www/owncloud/config/config.php /var/www/owncloud/config/config.php.bak
