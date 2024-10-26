@@ -3,13 +3,21 @@
 # Meminta input URL baru dari pengguna
 read -p "Masukkan URL baru untuk OwnCloud (misalnya: cloud.example.com): " new_url
 
-# Menghapus semua entri trusted_domains dari config.php
-sudo sed -i "/'trusted_domains' =>/,/),/d" /var/www/owncloud/config/config.php
+# Buka file konfigurasi dan tambahkan trusted_domains secara manual
+sudo nano /var/www/owncloud/config/config.php
 
-# Menambahkan entri baru ke trusted_domains
-sudo sed -i "/);/i\  'trusted_domains' => array (\n    0 => 'localhost',\n    1 => '$new_url',\n  )," /var/www/owncloud/config/config.php
+echo "
+# Langkah 1: Tambahkan trusted domain di dalam bagian ini:
+'trusted_domains' =>
+array (
+    0 => 'localhost',
+    1 => '$new_url',
+),
+"
 
-# Memperbarui konfigurasi Apache dengan URL baru
+echo "Tekan 'CTRL + O' untuk menyimpan, dan 'CTRL + X' untuk keluar."
+
+# Memastikan konfigurasi Apache sudah benar dengan URL baru
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 <VirtualHost *:80>
   ServerName $new_url
