@@ -3,11 +3,11 @@
 
 # Menampilkan logo dan pesan selamat datang
 showMe
-echo "Selamat datang di Instalasi OwnCloud! By Putra"
+echo "Selamat datang di Instalasi OwnCloud!"
 sleep 2s
 
 # Meminta URL kustom dari pengguna
-read -p "Masukkan URL kustom untuk OwnCloud (misalnya: putraganteng.com): " custom_url
+read -p "Masukkan URL kustom untuk OwnCloud (misalnya: cloud.example.com): " custom_url
 
 # Memperbarui dan menginstal paket yang diperlukan
 sudo apt update && sudo apt upgrade -y
@@ -23,6 +23,7 @@ sudo apt install owncloud-complete-files -y
 # Membuat direktori OwnCloud dan memberikan izin
 sudo mkdir -p /var/www/owncloud
 sudo chown -R www-data:www-data /var/www/owncloud
+sudo chmod -R 755 /var/www/owncloud
 
 # Konfigurasi database MySQL
 sudo mysql --user=root << EOF
