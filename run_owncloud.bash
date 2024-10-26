@@ -1,15 +1,18 @@
 #!/bin/bash
 
 # Meminta input URL baru dari pengguna
-read -p "Masukkan URL baru untuk OwnCloud (misalnya: putraganteng.com): " custom_url
+read -p "Masukkan URL baru untuk OwnCloud (misalnya: putraganteng.com): " new_url
 
-# Membuat konfigurasi Apache dengan URL baru
+# Menambahkan URL baru ke trusted_domains
+sudo sed -i "/'trusted_domains' =>/a\ \ \ \ 2 => '$new_url'," /var/www/owncloud/config/config.php
+
+# Memperbarui konfigurasi Apache dengan URL baru
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 <VirtualHost *:80>
-  ServerName $custom_url
-  DocumentRoot /var/www/owncloud/
+  ServerName $new_url
+  DocumentRoot /var/www/owncloud
 
-  <Directory /var/www/owncloud/>
+  <Directory /var/www/owncloud>
     Options +FollowSymlinks
     AllowOverride All
     Require all granted
@@ -22,13 +25,13 @@ sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
     SetEnv HTTP_HOME /var/www/owncloud
   </Directory>
 
-  ErrorLog \${APACHE_LOG_DIR}/error.log
-  CustomLog \${APACHE_LOG_DIR}/access.log combined
+  ErrorLog \${APACHE_LOG_DIR}/owncloud_error.log
+  CustomLog \${APACHE_LOG_DIR}/owncloud_access.log combined
 </VirtualHost>
 EOL
 
-# Mengaktifkan konfigurasi dan merestart Apache
-sudo a2ensite owncloud.conf
+# Restart Apache untuk menerapkan perubahan
 sudo systemctl restart apache2
 
-echo "OwnCloud sekarang berjalan di URL: $custom_url"
+# Pesan akhir
+echo "OwnCloud sekarang berjalan di URL: http://$new_url"
