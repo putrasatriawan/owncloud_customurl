@@ -1,13 +1,39 @@
 #!/bin/bash
 
-
+# Fungsi untuk menampilkan logo dan pesan
+showMe() {
+  echo "@@@@@@@@@@@@@@@@@@@@@@B?!JJ55#@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@G!^~J!?#@@@@@@@@@@@@@@@@@@@
+@@@@@@@&#BBBBBB#&@@@5!7?777J@@@#BBB#BB##&@@@@@@@
+@@@@&#BGGGBBPPPGG&@#7?!77!77#@GBPPPBBBGGBB&@@@@@
+@&&#BGGGGGBBPPPBB&@YJ??J?J??G@BBGPPBBBGGGGB##&@@
+@@#BBGGGGGGBGGG#B&#GGGGGGGGGG&##GGGBGGGGGGBB#@@@
+@##BGGGGGGGBBBB#&B55PPPPPP5G&#BBBBBGGGGGGGB##@@@
+@@&BGGGGGGGBBBBBPYPB@@@@@#PYPBBBBBGGGGGGGGB#@@@
+@@#BBGGGGGGGGG#BY5PPB@@@@@#PG5YB#BPGGGGGGGBB#@@@
+@@&&BBGGGGGGGGGGYGPPB@&P#@#PPG55GGPGGGGGGGB##@@@
+@@@&BBGGGBGBGBGBYGPPB@@#&@#PPG5PBBGBGGGGGGB&@@@@
+@@@&#BBGGBGBBBB@YPPPB@@&@@#PPGY&#BBBBBGGGG##@@@@
+@@@@#BBBBBBB##@@GYGPB@&P#@#PG5P@@##BBBBBBBB@@@@@
+@@@&BBBBBB#&@&##&G5PB@@@@@#P5P&&##@&#B#BBBB&@@@@
+@@@#BB#B##@@@#5PB&B5P&@@@&GYG&#PPG@@@&#B#B#B@@@@
+@@#BB###@@@@@@BPPPGBG5PGP5PBBPPPG@@@@@@&B#B##@@@
+@&####&@@@@&BPY5PP5PPBGPGGPP5PP5J5B&@@@@&#####@@
+&###@@@@@@@&GJYJY555PYB?G55PP55JYY5#@@@@@@@&##&@
+#&@@@@@@@@@@@@BGYJ5J5P5?YP5YYYJGB&@@@@@@@@@@@@#&
+@@@@@@@@@@@@@@@@&@BG#BGBGG#GG&&@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+"
+}
 
 # Menampilkan logo dan pesan selamat datang
 showMe
 echo "Selamat datang di Instalasi OwnCloud!"
 sleep 2s
 
-# Meminta URL kustom dari pengguna
+# Meminta input URL kustom dari pengguna
 read -p "Masukkan URL kustom untuk OwnCloud (misalnya: cloud.example.com): " custom_url
 
 # Memperbarui dan menginstal paket yang diperlukan
@@ -42,11 +68,23 @@ sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --admin-user "admin" \
    --admin-pass "admin"
 
-# Menghapus semua entri trusted_domains dan menambahkan yang baru
-sudo sed -i "/'trusted_domains' =>/,/),/d" /var/www/owncloud/config/config.php
-sudo sed -i "/);/i\  'trusted_domains' => array (\n    0 => 'localhost',\n    1 => '$custom_url',\n  )," /var/www/owncloud/config/config.php
+# Backup konfigurasi sebelum perubahan
+sudo cp /var/www/owncloud/config/config.php /var/www/owncloud/config/config.php.bak
 
-# Membuat konfigurasi Apache dengan URL kustom
+# Menambahkan domain baru ke trusted_domains dengan aman menggunakan PHP
+sudo php -r "
+\$config_file = '/var/www/owncloud/config/config.php';
+\$config = include \$config_file;
+if (!in_array('$custom_url', \$config['trusted_domains'])) {
+    \$config['trusted_domains'][] = '$custom_url';
+    file_put_contents(\$config_file, '<?php return ' . var_export(\$config, true) . ';');
+    echo 'Trusted domain berhasil ditambahkan: $custom_url\n';
+} else {
+    echo 'Domain sudah ada di trusted_domains.\n';
+}
+"
+
+# Membuat konfigurasi Apache dengan URL baru
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 <VirtualHost *:80>
   ServerName $custom_url
@@ -74,6 +112,8 @@ EOL
 sudo a2dissite 000-default.conf
 sudo a2ensite owncloud.conf
 sudo a2enmod rewrite
+
+# Restart Apache untuk menerapkan perubahan
 sudo systemctl restart apache2
 
 # Pesan akhir
