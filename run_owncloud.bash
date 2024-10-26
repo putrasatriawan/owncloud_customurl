@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Meminta input URL baru dari pengguna
-read -p "Masukkan URL baru untuk OwnCloud (misalnya: cloud.example.com): " custom_url
+read -p "Masukkan URL baru untuk OwnCloud (misalnya: putraganteng.com): " custom_url
 
 # Membuat konfigurasi Apache dengan URL baru
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
