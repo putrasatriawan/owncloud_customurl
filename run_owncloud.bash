@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Meminta URL baru dari pengguna
+# Meminta input URL baru dari pengguna
 read -p "Masukkan URL baru untuk OwnCloud (misalnya: cloud.example.com): " custom_url
 
-# Membuat ulang konfigurasi Apache dengan URL baru
+# Menghapus konfigurasi lama dan membuat konfigurasi baru dengan URL baru
+rm /etc/apache2/sites-available/owncloud.conf
+
 cat > /etc/apache2/sites-available/owncloud.conf << EOL
 <VirtualHost *:80>
   ServerName $custom_url
