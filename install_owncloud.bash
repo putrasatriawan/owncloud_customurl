@@ -3,19 +3,19 @@
 # Fungsi untuk menampilkan banner dan pesan
 showBanner() {
   echo "============================================="
-  echo "        🚀 Selamat Datang di Instalasi OwnCloud! 🚀"
-  echo "              By Putra - Cloud Enthusiast"
+  echo "        🚀 Instalasi OwnCloud Dimulai! 🚀"
+  echo "             By Putra - Cloud Enthusiast"
   echo "============================================="
   echo ""
 }
 
-# Menampilkan banner selamat datang
+# Tampilkan banner
 showBanner
 
 # Meminta input URL kustom dari pengguna
-read -p "🌐 Masukkan URL kustom untuk konfigurasi (misalnya: cloud.example.com): " custom_url
+read -p "🌐 Masukkan URL kustom untuk OwnCloud (misalnya: cloud.example.com): " custom_url
 
-# Memperbarui dan menginstal semua paket yang dibutuhkan
+# Memperbarui dan menginstal semua paket yang diperlukan
 echo "🔄 Memperbarui paket dan menginstal dependensi..."
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt install apache2 mariadb-server -y
@@ -38,8 +38,26 @@ sudo mkdir -p /var/www/owncloud
 sudo chown -R www-data:www-data /var/www/owncloud
 sudo chmod -R 755 /var/www/owncloud
 
-# Membuat file konfigurasi Apache
-echo "⚙️ Membuat konfigurasi Apache dengan URL: $custom_url"
+# Konfigurasi database MySQL untuk OwnCloud
+echo "🛠️ Mengonfigurasi database MySQL..."
+sudo mysql --user=root << EOF
+CREATE DATABASE ownclouddb;
+GRANT ALL PRIVILEGES ON ownclouddb.* TO 'root'@'localhost' IDENTIFIED BY '1234';
+FLUSH PRIVILEGES;
+EOF
+
+# Menjalankan instalasi OwnCloud
+echo "🚀 Menjalankan instalasi OwnCloud..."
+sudo -u www-data php /var/www/owncloud/occ maintenance:install \
+   --database "mysql" \
+   --database-name "ownclouddb" \
+   --database-user "root" \
+   --database-pass "1234" \
+   --admin-user "admin" \
+   --admin-pass "1234"
+
+# Membuat konfigurasi Apache dengan URL kustom
+echo "🔧 Mengatur konfigurasi Apache dengan URL: $custom_url"
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 <VirtualHost *:80>
   ServerName $custom_url
@@ -63,34 +81,32 @@ sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 </VirtualHost>
 EOL
 
-# Mengaktifkan konfigurasi Apache dan restart service
-echo "🔄 Mengaktifkan konfigurasi Apache dan restart service..."
+# Mengaktifkan konfigurasi dan merestart Apache
+echo "🔄 Mengaktifkan konfigurasi Apache dan merestart layanan..."
 sudo a2ensite owncloud.conf
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 
-# Konfigurasi database MySQL untuk OwnCloud
-echo "🛠️ Konfigurasi database MySQL..."
-sudo mysql --password=1234 --user=root --host=localhost << EOF
-CREATE DATABASE ownclouddb;
-GRANT ALL PRIVILEGES ON ownclouddb.* TO 'root'@'localhost' IDENTIFIED BY '1234';
-FLUSH PRIVILEGES;
-EOF
+# Membuka konfigurasi untuk menambahkan trusted domain secara manual
+echo "🛠️ Membuka konfigurasi untuk trusted domains..."
+sudo nano /var/www/owncloud/config/config.php
 
-# Menjalankan instalasi OwnCloud melalui CLI
-echo "🚀 Menjalankan instalasi OwnCloud..."
-sudo -u www-data php /var/www/owncloud/occ maintenance:install \
-   --database "mysql" \
-   --database-name "ownclouddb" \
-   --database-user "root" \
-   --database-pass "1234" \
-   --admin-user "root" \
-   --admin-pass "1234"
+echo "⚠️ Tambahkan URL berikut ke bagian 'trusted_domains':"
+echo "----------------------------------------------------"
+echo "
+'trusted_domains' =>
+array (
+    0 => 'localhost',
+    1 => '$custom_url',  # Tambahkan URL baru Anda di sini
+),
+"
+echo "----------------------------------------------------"
+echo "👉 Setelah selesai, simpan dan keluar dari editor (Ctrl + O, Enter, Ctrl + X)."
+sleep 5s
 
 # Pesan akhir
 echo "🎉 Instalasi OwnCloud selesai!"
 echo "🌐 Akses OwnCloud melalui: http://$custom_url"
-echo "⚡ Anda dapat menjalankannya dengan memasukkan URL baru kapanpun."
 echo "============================================="
-echo "            By Putra - Cloud Enthusiast"
+echo "         By Putra - Cloud Enthusiast"
 echo "============================================="
