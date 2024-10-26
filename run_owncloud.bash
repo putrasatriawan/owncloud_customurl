@@ -4,7 +4,7 @@
 read -p "Masukkan URL baru untuk OwnCloud (misalnya: cloud.example.com): " custom_url
 
 # Membuat konfigurasi Apache dengan URL baru
-cat > /etc/apache2/sites-available/owncloud.conf << EOL
+sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 <VirtualHost *:80>
   ServerName $custom_url
   DocumentRoot /var/www/owncloud/
@@ -27,11 +27,8 @@ cat > /etc/apache2/sites-available/owncloud.conf << EOL
 </VirtualHost>
 EOL
 
-# Mengaktifkan konfigurasi baru dan merestart Apache
-a2ensite owncloud.conf
-a2dissite 000-default.conf
-a2enmod rewrite
-systemctl restart apache2
+# Mengaktifkan konfigurasi dan merestart Apache
+sudo a2ensite owncloud.conf
+sudo systemctl restart apache2
 
-# Menampilkan pesan sukses
 echo "OwnCloud sekarang berjalan di URL: $custom_url"
