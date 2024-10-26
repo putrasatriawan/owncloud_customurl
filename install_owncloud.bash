@@ -1,5 +1,32 @@
 #!/bin/bash
 
+# Fungsi untuk menampilkan logo dan pesan
+showMe() {
+  echo "@@@@@@@@@@@@@@@@@@@@@@B?!JJ55#@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@G!^~J!?#@@@@@@@@@@@@@@@@@@@
+@@@@@@@&#BBBBBB#&@@@5!7?777J@@@#BBB#BB##&@@@@@@@
+@@@@&#BGGGBBPPPGG&@#7?!77!77#@GBPPPBBBGGBB&@@@@@
+@&&#BGGGGGBBPPPBB&@YJ??J?J??G@BBGPPBBBGGGGB##&@@
+@@#BBGGGGGGBGGG#B&#GGGGGGGGGG&##GGGBGGGGGGBB#@@@
+@##BGGGGGGGBBBB#&B55PPPPPP5G&#BBBBBGGGGGGGB##@@@
+@@&BGGGGGGGBBBBBPYPB@@@@@#PYPBBBBBGGGGGGGGB#@@@
+@@#BBGGGGGGGGG#BY5PPB@@@@@#PG5YB#BPGGGGGGGBB#@@@
+@@&&BBGGGGGGGGGGYGPPB@&P#@#PPG55GGPGGGGGGGB##@@@
+@@@&BBGGGBGBGBGBYGPPB@@#&@#PPG5PBBGBGGGGGGB&@@@@
+@@@&#BBGGBGBBBB@YPPPB@@&@@#PPGY&#BBBBBGGGG##@@@@
+@@@@#BBBBBBB##@@GYGPB@&P#@#PG5P@@##BBBBBBBB@@@@@
+@@@&BBBBBB#&@&##&G5PB@@@@@#P5P&&##@&#B#BBBB&@@@@
+@@@#BB#B##@@@#5PB&B5P&@@@&GYG&#PPG@@@&#B#B#B@@@@
+@@#BB###@@@@@@BPPPGBG5PGP5PBBPPPG@@@@@@&B#B##@@@
+@&####&@@@@&BPY5PP5PPBGPGGPP5PP5J5B&@@@@&#####@@
+&###@@@@@@@&GJYJY555PYB?G55PP55JYY5#@@@@@@@&##&@
+#&@@@@@@@@@@@@BGYJ5J5P5?YP5YYYJGB&@@@@@@@@@@@@#&
+@@@@@@@@@@@@@@@@&@BG#BGBGG#GG&&@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+"
+}
 
 # Menampilkan logo dan pesan selamat datang
 showMe
@@ -39,6 +66,9 @@ sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --database-pass "password" \
    --admin-user "admin" \
    --admin-pass "admin"
+
+# Menambahkan URL kustom ke trusted_domains secara otomatis
+sudo sed -i "/'trusted_domains' =>/a\ \ \ \ 1 => '$custom_url'," /var/www/owncloud/config/config.php
 
 # Membuat konfigurasi Apache dengan URL kustom
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
