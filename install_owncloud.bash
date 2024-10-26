@@ -1,59 +1,28 @@
-#!/bin/bash
+#!/bin/bash    
 
-# Menampilkan pesan selamat datang dan meminta input URL kustom
+# Menampilkan logo dan pesan selamat datang
+showMe    
 echo "Selamat datang di Instalasi OwnCloud!"
-read -p "Masukkan URL kustom untuk OwnCloud (misalnya: cloud.example.com): " custom_url
+sleep 2s
 
-# Memperbarui sistem dan menginstal paket yang dibutuhkan
+# Memperbarui sistem dan menginstal paket yang diperlukan
 apt update && apt upgrade -y
-apt install apache2 mariadb-server -y
-apt install php libapache2-mod-php php-mysql php-intl php-curl php-json php-gd php-xml php-mbstring php-zip php-cli -y
-apt install curl gnupg2 -y
+apt install apache2 mariadb-server php7.4 libapache2-mod-php7.4 \
+php7.4-{mysql,intl,curl,json,gd,xml,mbstring,zip} curl gnupg2 -y
 
-# Menambahkan repository OwnCloud dan menginstalnya
+# Menambahkan repository OwnCloud dan menginstal OwnCloud
 echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/server:/10.9.1/Ubuntu_22.04/ /' > /etc/apt/sources.list.d/owncloud.list
 curl -fsSL https://download.opensuse.org/repositories/isv:ownCloud:server:/10/Ubuntu_20.04/Release.key | gpg --dearmor > /etc/apt/trusted.gpg.d/owncloud.gpg
 apt update
 apt install owncloud-complete-files -y
 
-# Membuat direktori OwnCloud
+# Membuat direktori OwnCloud dan memberikan izin
 mkdir -p /var/www/owncloud
-
-# Memberikan izin kepemilikan direktori
 chown -R www-data:www-data /var/www/owncloud
 
-# Membuat file konfigurasi Apache dengan URL kustom
-cat > /etc/apache2/sites-available/owncloud.conf << EOL
-<VirtualHost *:80>
-  ServerName $custom_url
-  DocumentRoot /var/www/owncloud/
-
-  <Directory /var/www/owncloud/>
-    Options +FollowSymlinks
-    AllowOverride All
-    Require all granted
-
-    <IfModule mod_dav.c>
-      Dav off
-    </IfModule>
-
-    SetEnv HOME /var/www/owncloud
-    SetEnv HTTP_HOME /var/www/owncloud
-  </Directory>
-
-  ErrorLog \${APACHE_LOG_DIR}/error.log
-  CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOL
-
-# Mengaktifkan konfigurasi Apache dan restart service
-a2ensite owncloud.conf
-a2enmod rewrite
-systemctl restart apache2
-
-# Konfigurasi database MySQL untuk OwnCloud
+# Konfigurasi database MySQL
 mysql --user=root << EOF
-CREATE DATABASE ownclouddb;
+CREATE DATABASE IF NOT EXISTS ownclouddb;
 GRANT ALL PRIVILEGES ON ownclouddb.* TO 'ownclouduser'@'localhost' IDENTIFIED BY 'password';
 FLUSH PRIVILEGES;
 EOF
@@ -67,4 +36,5 @@ sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --admin-user "admin" \
    --admin-pass "admin"
 
-echo "Instalasi OwnCloud selesai! Anda dapat menjalankannya dengan memasukkan URL baru kapanpun."
+# Menampilkan pesan selesai
+echo "Instalasi OwnCloud selesai! Anda dapat menjalankan OwnCloud dengan URL yang Anda inginkan."
