@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+
 # Menampilkan logo dan pesan selamat datang
 showMe
 echo "Selamat datang di Instalasi OwnCloud!"
@@ -41,8 +42,9 @@ sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --admin-user "admin" \
    --admin-pass "admin"
 
-# Menambahkan URL kustom ke trusted_domains dengan benar
-sudo sed -i "/'trusted_domains' =>/a\ \ \ \ 1 => '$custom_url'," /var/www/owncloud/config/config.php
+# Menghapus semua entri trusted_domains dan menambahkan yang baru
+sudo sed -i "/'trusted_domains' =>/,/),/d" /var/www/owncloud/config/config.php
+sudo sed -i "/);/i\  'trusted_domains' => array (\n    0 => 'localhost',\n    1 => '$custom_url',\n  )," /var/www/owncloud/config/config.php
 
 # Membuat konfigurasi Apache dengan URL kustom
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
