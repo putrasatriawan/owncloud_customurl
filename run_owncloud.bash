@@ -3,21 +3,23 @@
 # Meminta input URL baru dari pengguna
 read -p "Masukkan URL baru untuk OwnCloud (misalnya: cloud.example.com): " new_url
 
-# Buka file konfigurasi dan tambahkan trusted_domains secara manual
-sudo nano /var/www/owncloud/config/config.php
+# Backup file config.php sebelum mengedit
+sudo cp /var/www/owncloud/config/config.php /var/www/owncloud/config/config.php.bak
 
-echo "
-# Langkah 1: Tambahkan trusted domain di dalam bagian ini:
-'trusted_domains' =>
-array (
-    0 => 'localhost',
-    1 => '$new_url',
-),
+# Menambahkan domain baru ke trusted_domains secara manual
+sudo php -r "
+\$config_file = '/var/www/owncloud/config/config.php';
+\$config = include \$config_file;
+if (!in_array('$new_url', \$config['trusted_domains'])) {
+    \$config['trusted_domains'][] = '$new_url';
+    file_put_contents(\$config_file, '<?php return ' . var_export(\$config, true) . ';');
+    echo 'Trusted domain berhasil ditambahkan: $new_url\n';
+} else {
+    echo 'Domain sudah ada di trusted_domains.\n';
+}
 "
 
-echo "Tekan 'CTRL + O' untuk menyimpan, dan 'CTRL + X' untuk keluar."
-
-# Memastikan konfigurasi Apache sudah benar dengan URL baru
+# Memperbarui konfigurasi Apache dengan URL baru
 sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 <VirtualHost *:80>
   ServerName $new_url
@@ -41,7 +43,7 @@ sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 </VirtualHost>
 EOL
 
-# Menonaktifkan konfigurasi default Apache dan mengaktifkan konfigurasi OwnCloud baru
+# Menonaktifkan konfigurasi default Apache dan mengaktifkan OwnCloud
 sudo a2dissite 000-default.conf
 sudo a2ensite owncloud.conf
 sudo a2enmod rewrite
