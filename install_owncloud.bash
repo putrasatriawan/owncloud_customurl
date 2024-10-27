@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Menampilkan pesan selamat datang dan meminta input URL kustom
-echo "Selamat datang di Instalasi OwnCloud!"
-read -p "Masukkan URL kustom untuk konfigurasi (misalnya: cloud.example.com): " custom_url
+echo "Selamat datang di Instalasi OwnCloud! By Putra"
+read -p "Masukkan URL kustom untuk konfigurasi (misalnya: putraganteng.com): " custom_url
 
 # Memperbarui dan menginstal semua paket yang dibutuhkan
 apt-get update
