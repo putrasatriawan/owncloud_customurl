@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Fungsi untuk menampilkan banner dan pesan
+# Fungsi untuk menampilkan pesan dan banner selamat datang
 showBanner() {
   echo "============================================="
-  echo "        🚀 Instalasi OwnCloud Dimulai! 🚀"
-  echo "             By Putra - Cloud Enthusiast"
+  echo "       🚀 Instalasi OwnCloud Dimulai 🚀"
+  echo "         By Putra - Cloud Enthusiast"
   echo "============================================="
   echo ""
 }
@@ -38,22 +38,22 @@ sudo mkdir -p /var/www/owncloud
 sudo chown -R www-data:www-data /var/www/owncloud
 sudo chmod -R 755 /var/www/owncloud
 
-# Konfigurasi database MySQL untuk OwnCloud
+# Konfigurasi database MySQL
 echo "🛠️ Mengonfigurasi database MySQL..."
 sudo mysql --user=root << EOF
-CREATE DATABASE ownclouddb;
+CREATE DATABASE IF NOT EXISTS ownclouddb;
 GRANT ALL PRIVILEGES ON ownclouddb.* TO 'root'@'localhost' IDENTIFIED BY '1234';
 FLUSH PRIVILEGES;
 EOF
 
-# Menjalankan instalasi OwnCloud
+# Menjalankan instalasi OwnCloud melalui CLI
 echo "🚀 Menjalankan instalasi OwnCloud..."
 sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --database "mysql" \
    --database-name "ownclouddb" \
    --database-user "root" \
    --database-pass "1234" \
-   --admin-user "admin" \
+   --admin-user "root" \
    --admin-pass "1234"
 
 # Membuat konfigurasi Apache dengan URL kustom
@@ -81,14 +81,14 @@ sudo tee /etc/apache2/sites-available/owncloud.conf > /dev/null << EOL
 </VirtualHost>
 EOL
 
-# Mengaktifkan konfigurasi dan merestart Apache
-echo "🔄 Mengaktifkan konfigurasi Apache dan merestart layanan..."
+# Mengaktifkan konfigurasi Apache dan merestart layanan
+echo "🔄 Mengaktifkan konfigurasi dan merestart Apache..."
 sudo a2ensite owncloud.conf
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 
-# Membuka konfigurasi untuk menambahkan trusted domain secara manual
-echo "🛠️ Membuka konfigurasi untuk trusted domains..."
+# Membuka file konfigurasi untuk menambahkan trusted domain
+echo "🛠️ Membuka konfigurasi untuk menambahkan trusted domains..."
 sudo nano /var/www/owncloud/config/config.php
 
 echo "⚠️ Tambahkan URL berikut ke bagian 'trusted_domains':"
