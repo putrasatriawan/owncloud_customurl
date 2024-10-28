@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Meminta input URL baru dari pengguna
-read -p "Masukkan URL baru untuk OwnCloud (misalnya: cloud.example.com): " new_url
+read -p "Masukkan URL baru untuk OwnCloud By PUTRA (misalnya: putragenteng.com): " new_url
 
 # Buka file konfigurasi dan tambahkan trusted_domains secara manual
 sudo nano /var/www/owncloud/config/config.php
