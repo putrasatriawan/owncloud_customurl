@@ -2,7 +2,7 @@
 
 # Menampilkan pesan selamat datang dan meminta input URL kustom
 echo "Selamat datang di Instalasi OwnCloud! By PUTRA"
-read -p "Masukkan URL kustom untuk konfigurasi (misalnya: yourdomain.com): " custom_url
+read -p "Masukkan URL kustom untuk konfigurasi (misalnya: putragenteng.com): " custom_url
 
 # Memastikan semua dependensi terinstal
 echo "Memeriksa dan menginstal dependensi yang diperlukan..."
