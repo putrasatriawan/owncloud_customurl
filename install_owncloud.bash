@@ -65,4 +65,4 @@ sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --admin-user "root" \
    --admin-pass "1234"
 
-echo "Instalasi OwnCloud selesai! Anda dapat menjalankannya dengan memasukkan URL baru kapanpun."
+echo "Instalasi OwnCloud selesai! Anda dapat menjalankannya dengan memasukkan URL baru kapanpuns."
