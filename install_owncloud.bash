@@ -6,21 +6,24 @@ read -p "Masukkan URL kustom untuk konfigurasi (misalnya: putraganteng.com): " c
 
 # Memperbarui dan menginstal semua paket yang dibutuhkan
 apt-get update
-apt install apache2 mariadb-server -y
-apt install php7.4 libapache2-mod-php7.4 php7.4-{mysql,intl,curl,json,gd,xml,mbstring,zip} -y
-apt install curl gnupg2 -y
+apt-get install -y apache2 mariadb-server \
+  php7.4 libapache2-mod-php7.4 php7.4-{mysql,intl,curl,json,gd,xml,mbstring,zip} \
+  curl gnupg2 software-properties-common
+
 add-apt-repository ppa:ondrej/php --yes &> /dev/null
-apt update
-apt install php7.4 php7.4-mysql php-pear -y
+apt-get update
+apt-get install -y php7.4 php7.4-mysql php-pear
 
 # Menambahkan repository dan menginstal OwnCloud
-echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/server:/10.9.1/Ubuntu_22.04/ /' > /etc/apt/sources.l>
-curl -fsSL https://download.opensuse.org/repositories/isv:ownCloud:server:/10/Ubuntu_20.04/Release.key | gpg --dearmor >
-apt update
-apt install owncloud-complete-files -y
+echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/server:/10.9.1/Ubuntu_22.04/ /' > /etc/apt/sources.list.d/owncloud.list
+curl -fsSL https://download.opensuse.org/repositories/isv:ownCloud:server:/10/Ubuntu_20.04/Release.key | gpg --dearmor -o /usr/share/keyrings/owncloud.key
+apt-get update
+apt-get install -y owncloud-complete-files
 
 # Membuat direktori OwnCloud
 mkdir -p /var/www/owncloud
+chown -R www-data:www-data /var/www/owncloud
+chmod -R 755 /var/www/owncloud
 
 # Membuat file konfigurasi Apache dengan URL yang dimasukkan
 cat > /etc/apache2/sites-available/owncloud.conf << EOL
@@ -44,15 +47,17 @@ cat > /etc/apache2/sites-available/owncloud.conf << EOL
   ErrorLog \${APACHE_LOG_DIR}/error.log
   CustomLog \${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
-EOL# Mengaktifkan konfigurasi Apache dan restart service
+EOL
+
+# Mengaktifkan konfigurasi Apache dan restart service
 a2ensite owncloud.conf
 a2enmod rewrite
 systemctl restart apache2
 
 # Konfigurasi database MySQL untuk OwnCloud
-mysql --password=1234 --user=root --host=localhost << EOF
-CREATE DATABASE ownclouddb;
-GRANT ALL PRIVILEGES ON ownclouddb.* TO 'root'@'localhost' IDENTIFIED BY '1234';
+mysql -u root << EOF
+CREATE DATABASE IF NOT EXISTS ownclouddb;
+GRANT ALL PRIVILEGES ON ownclouddb.* TO 'ownclouduser'@'localhost' IDENTIFIED BY 'owncloudpass';
 FLUSH PRIVILEGES;
 EOF
 
@@ -60,9 +65,9 @@ EOF
 sudo -u www-data php /var/www/owncloud/occ maintenance:install \
    --database "mysql" \
    --database-name "ownclouddb" \
-   --database-user "root" \
-   --database-pass "1234" \
-   --admin-user "root" \
-   --admin-pass "1234"
+   --database-user "ownclouduser" \
+   --database-pass "owncloudpass" \
+   --admin-user "admin" \
+   --admin-pass "adminpassword"
 
-echo "Instalasi OwnCloud selesai! Anda dapat menjalankannya dengan memasukkan URL baru kapanpun."
+echo "Instalasi OwnCloud selesai! Anda dapat mengaksesnya di http://$custom_url"
