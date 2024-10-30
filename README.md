@@ -1,6 +1,4 @@
-Tentu, saya akan bantu gabungkan semua informasi yang telah kita diskusikan menjadi satu skrip README.md yang komprehensif dan siap digunakan di GitHub.
 
-README.md
 
 Markdown
 ## Instalasi dan Konfigurasi OwnCloud dengan Domain Kustom
