@@ -6,10 +6,10 @@ Markdown
 ## Instalasi dan Konfigurasi OwnCloud dengan Domain Kustom
 
 ### Pendahuluan
-Skrip ini akan memandu Anda secara lengkap dalam menginstal dan mengkonfigurasi OwnCloud pada sistem berbasis Debian (seperti Ubuntu, Raspbian, dll.) dengan domain kustom. Dengan skrip ini, Anda akan memiliki cloud storage pribadi yang aman dan dapat diakses dari mana saja.
+Skrip ini akan memandu Anda secara lengkap dalam menginstal dan mengkonfigurasi OwnCloud pada sistem berbasis Debian seperti Ubuntu dengan domain kustom. Dengan skrip ini, Anda akan memiliki cloud storage pribadi yang aman dan dapat diakses dari mana saja.
 
 ### Prasyarat
-* **Sistem Operasi:** Sistem berbasis Debian (misalnya, Ubuntu, Debian, Raspbian)
+* **Sistem Operasi:** Sistem berbasis Debian misalnya Ubuntu
 * **Akses:** Akses root atau sudo ke server
 * **Domain:** Domain yang sudah terpoin ke server Anda
 
