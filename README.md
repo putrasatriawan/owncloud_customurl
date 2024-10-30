@@ -12,8 +12,6 @@ Skrip ini akan memandu Anda secara lengkap dalam menginstal dan mengkonfigurasi 
 * **Domain:** Domain yang sudah terpoin ke server Anda
 
 ### Langkah-langkah Instalasi
-
-1. **Update Paket:**
    ```bash
    sudo apt install curl
    wget  https://raw.githubusercontent.com/putrasatriawan/owncloud_customurl/refs/heads/main/install_first_owncloud.bash
